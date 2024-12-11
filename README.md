@@ -1,13 +1,19 @@
 # namarec
 
-ニコ生録画ツールです。
+ニコ生録画ツールです。<br>
+HLS配信をmp4ファイルに保存します。
+
+:white_check_mark: 生放送録画<br>
+:white_check_mark: タイムシフト録画
+
+<sup><b>※ コメントやギフト演出は付きません。</b></sup>
 
 ## インストール
 
 ### Go:
 
 ```sh
-go install github.com/genkaieng/namarec
+go install github.com/genkaieng/namarec@latest
 ```
 
 ## Requirements
