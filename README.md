@@ -1,4 +1,4 @@
-# namarec
+# namarec  -生REC-
 
 ニコ生録画ツールです。<br>
 HLS配信をmp4ファイルに保存します。
