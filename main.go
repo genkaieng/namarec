@@ -18,13 +18,29 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+const version = "v0.1.1"
+
 func main() {
 	args := os.Args
 	if len(args) < 2 {
-		fmt.Println("引数に生放送IDを指定してください。")
+		fmt.Println("引数に生放送IDを指定してください")
+		fmt.Println("namarec", "lv123456789")
 		return
 	}
-	lvid := args[1]
+	if args[1] == "-version" {
+		fmt.Println("namarec", version, "Copyright (c) 2024 genkaieng")
+		return
+	}
+
+	var lvid string
+	if strings.HasPrefix(args[1], "lv") {
+		lvid = args[1]
+	}
+	if len(lvid) == 0 {
+		fmt.Println("生放送IDが不正")
+		fmt.Println("namarec", "lv123456789")
+		return
+	}
 
 	session := os.Getenv("SESSION")
 	html, err := get(lvid, session)
