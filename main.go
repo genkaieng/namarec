@@ -32,8 +32,7 @@ func main() {
 		panic(err)
 	}
 
-	re := regexp.MustCompile(`wss://[\w./?=+\-&#%]+`)
-	matches := re.FindAll(html, -1)
+	matches := regexp.MustCompile(`wss://[\w./?=+\-&#%]+`).FindAll(html, -1)
 	wsUri := strings.TrimSuffix(string(matches[0]), "&quot")
 	fmt.Println("DEBUG", "ws_uri:", wsUri)
 
@@ -72,11 +71,6 @@ func main() {
 	if err := cmd.Run(); err != nil {
 		fmt.Println("ERROR", "FFmpeg:", err)
 	}
-}
-
-type Result struct {
-	Error error
-	Body  []byte
 }
 
 func get(lvid string, session string) ([]byte, error) {
@@ -135,9 +129,13 @@ func connect(ctx context.Context, uri string) ([]byte, error) {
 				break loop
 			case msg := <-msgStream:
 				fmt.Println("INFO", "ws: ⇓", string(msg))
-				msgType := regexp.MustCompile(`"type":"(\w+)"`).FindSubmatch(msg)[1]
+				matches := regexp.MustCompile(`"type":"(\w+)"`).FindSubmatch(msg)
+				if len(matches) == 0 {
+					continue loop
+				}
+				msgType := string(matches[1])
 
-				switch string(msgType) {
+				switch msgType {
 				case "ping":
 					c.WriteMessage(websocket.TextMessage, []byte(`{"type":"pong"}`))
 					fmt.Println("INFO", "ws: ⇑", `{"type":"pong"}`)
