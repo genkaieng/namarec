@@ -167,6 +167,8 @@ func connect(ctx context.Context, uri string) ([]byte, error) {
 				case "stream":
 					uri := regexp.MustCompile(`"uri":"([^"]+)"`).FindSubmatch(msg)[1]
 					hlsUri <- uri
+				case "disconnect":
+					break loop
 				default:
 					continue loop
 				}
@@ -187,6 +189,7 @@ func connect(ctx context.Context, uri string) ([]byte, error) {
 				c.WriteMessage(websocket.TextMessage, []byte(`{"type":"keepSeat"}`))
 				fmt.Println("INFO", "ws: ⇑", `{"type":"keepSeat"}`)
 			case sec = <-keepIntervalSec:
+				fmt.Println("keepSeet Interval:", sec)
 				ticker.Reset(time.Duration(sec) * time.Second)
 			}
 		}
