@@ -21,12 +21,15 @@ def rec(url):
 def check_userid(user_id):
     v = os.getenv("NAMAREC_USER_ID_LIST")
     if v is not None:
-        if v.split(",") in user_id:
+        list = v.strip().split(",")
+        if user_id in list:
             return True
     return False
 
 
 def shutdown(_signum, _frame):
+    print("shutting down...")
+
     global processing
     processing = False
 
@@ -76,4 +79,4 @@ while processing:
         print(f"process exited: {code}, restarting...")
         time.sleep(1)
 
-print("bye")
+print("Bye")
