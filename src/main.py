@@ -5,8 +5,10 @@ import signal
 from dotenv import load_dotenv
 
 from parsers import get_live_url, get_userid
+from utils import contains
 
 load_dotenv()
+print("NAMAREC_USER_ID_LIST", os.getenv("NAMAREC_USER_ID_LIST"))
 
 subscribe_proc = None
 rec_procs = []
@@ -19,25 +21,21 @@ def rec(url):
 
 
 def check_userid(user_id):
-    v = os.getenv("NAMAREC_USER_ID_LIST")
-    if v is not None:
-        list = v.strip().split(",")
-        if user_id in list:
-            return True
-    return False
+    list = os.getenv("NAMAREC_USER_ID_LIST")
+    return list is not None and contains(user_id, list)
 
 
 def shutdown(_signum, _frame):
-    print("shutting down...")
+    print("Shutting down...")
 
     global processing
     processing = False
 
-    if subscribe_proc is not None and subscribe_proc.poll() is not None:
-        subscribe_proc.kill()
     for p in rec_procs:
         if p is not None and p.poll() is not None:
             p.kill()
+    if subscribe_proc is not None and subscribe_proc.poll() is not None:
+        subscribe_proc.kill()
 
 
 def run():
