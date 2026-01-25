@@ -53,7 +53,6 @@ def run():
     for line in p.stdout:
         if not processing:
             break
-        print(line)
 
         userid = get_userid(line)
         url = get_live_url(line)
