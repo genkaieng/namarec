@@ -1,13 +1,16 @@
 import subprocess
 import time
 import os
+import signal
 from dotenv import load_dotenv
 
 from parsers import get_live_url, get_userid
 
 load_dotenv()
 
-active_procs = []
+subscribe_proc = None
+rec_procs = []
+processing = True
 
 
 def rec(url):
@@ -23,33 +26,54 @@ def check_userid(user_id):
     return False
 
 
+def shutdown(_signum, _frame):
+    global processing
+    processing = False
+
+    if subscribe_proc is not None and subscribe_proc.poll() is not None:
+        subscribe_proc.kill()
+    for p in rec_procs:
+        if p is not None and p.poll() is not None:
+            p.kill()
+
+
 def run():
+    global subscribe_proc
     p = subprocess.Popen(
         ["nicopush", "subscribe"],
         stdout=subprocess.PIPE,
         text=True,
         bufsize=1,
     )
+    subscribe_proc = p
 
     assert p.stdout is not None
     for line in p.stdout:
+        if not processing:
+            break
         print(line)
         userid = get_userid(line)
-        if userid is None:
+        url = get_live_url(line)
+        if userid is None or url is None:
             continue
         if not check_userid(userid):
             continue
-        url = get_live_url(line)
-        if url is None:
-            continue
         proc = rec(url)
-        active_procs.append(proc)
-        active_procs[:] = [p for p in active_procs if p.poll() is None]
+        rec_procs.append(proc)
+        rec_procs[:] = [p for p in rec_procs if p.poll() is None]
 
     return p.wait()
 
 
-while True:
+signal.signal(signal.SIGTERM, shutdown)
+signal.signal(signal.SIGINT, shutdown)
+
+while processing:
     code = run()
-    print(f"process exited: {code}, restarting...")
-    time.sleep(1)
+    if not processing:
+        break
+    if processing:
+        print(f"process exited: {code}, restarting...")
+        time.sleep(1)
+
+print("bye")
