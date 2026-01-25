@@ -49,7 +49,10 @@ def get_user_name(s):
 def parse_notification(s):
     if s.split(" ")[3].upper() != "NOTIFICATION":
         return None
-    [date, time, _, type, notification] = s.split(" ")
+    slugs = s.split(" ")
+    if len(slugs) != 5:
+        return None
+    [date, time, _, type, notification] = slugs
     if type != "notification":
         return None
 
