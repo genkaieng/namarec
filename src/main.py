@@ -62,7 +62,7 @@ def run():
             continue
         if check_userid(info["userid"]):
             filename = "_".join([
-                info["date"],
+                info["date"].replace("/", ""),
                 info["live_title"],
                 info["user_name"],
                 info["lvid"]
@@ -70,8 +70,9 @@ def run():
             filename = f"{filename}.mp4"
             if info["live_url"] is not None:
                 proc = start_rec(info["live_url"], filename, NICOLIVE_SESSION)
-                rec_procs.append(proc)
-                rec_procs[:] = [p for p in rec_procs if p.poll() is None]
+                if proc is None:
+                    rec_procs.append(proc)
+                    rec_procs[:] = [p for p in rec_procs if p.poll() is None]
 
     return p.wait()
 

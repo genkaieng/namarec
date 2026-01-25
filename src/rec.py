@@ -8,6 +8,9 @@ from parsers import get_lvid
 TMP_DIR = "./tmp"
 OUTPUT_DIR = "./dist"
 
+# 録画中のlvidのリスト
+recording_list = []
+
 
 # tmp/がなければ作る
 def mkdirTmp():
@@ -20,9 +23,14 @@ def mkdirDist():
 
 
 def start_rec(url, file_name, user_session):
+    lvid = get_lvid(url)
+    if lvid in recording_list:
+        print(f"[skip] {lvid} is already recording (duplicate request)")
+        return None
+    recording_list.append(lvid)
+
     print("start recording...")
 
-    lvid = get_lvid(url)
     tmp_filepath = Path(TMP_DIR) / f"{lvid}.mp4"
     output_filepath = Path(OUTPUT_DIR) / file_name
 
@@ -59,6 +67,7 @@ def start_rec(url, file_name, user_session):
         if code_stream == 0 and code_ffmpeg == 0:
             mkdirDist()
             shutil.move(tmp_filepath, output_filepath)
+        recording_list.remove(lvid)
     threading.Thread(target=watch, daemon=True).start()
 
     return p_stream
