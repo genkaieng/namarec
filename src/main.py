@@ -8,14 +8,14 @@ from parsers import get_live_url, get_userid
 from utils import contains
 
 load_dotenv()
-print("NAMAREC_USER_ID_LIST", os.getenv("NAMAREC_USER_ID_LIST"))
+print("[INFO]", "NAMAREC_USER_ID_LIST:", os.getenv("NAMAREC_USER_ID_LIST"))
 
 subscribe_proc = None
 rec_procs = []
 processing = True
 
 
-def rec(url):
+def start_rec(url):
     print("start recording...")
     return subprocess.Popen(["nldl", url])
 
@@ -43,6 +43,7 @@ def run():
     p = subprocess.Popen(
         ["nicopush", "subscribe"],
         stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
         text=True,
         bufsize=1,
     )
@@ -53,15 +54,15 @@ def run():
         if not processing:
             break
         print(line)
+
         userid = get_userid(line)
         url = get_live_url(line)
         if userid is None or url is None:
             continue
-        if not check_userid(userid):
-            continue
-        proc = rec(url)
-        rec_procs.append(proc)
-        rec_procs[:] = [p for p in rec_procs if p.poll() is None]
+        if check_userid(userid):
+            proc = start_rec(url)
+            rec_procs.append(proc)
+            rec_procs[:] = [p for p in rec_procs if p.poll() is None]
 
     return p.wait()
 
