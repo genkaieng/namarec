@@ -4,25 +4,27 @@ import os
 import signal
 from dotenv import load_dotenv
 
-from parsers import get_live_url, get_userid
+from rec import start_rec
+from parsers import parse_notification
 from utils import contains
 
 load_dotenv()
-print("[INFO]", "NAMAREC_USER_ID_LIST:", os.getenv("NAMAREC_USER_ID_LIST"))
+
+NICOLIVE_SESSION = os.getenv("NICOLIVE_SESSION")
+NAMAREC_USER_ID_LIST = os.getenv("NAMAREC_USER_ID_LIST")
+
+print("[INFO]", "NAMAREC_USER_ID_LIST:", NAMAREC_USER_ID_LIST)
 
 subscribe_proc = None
 rec_procs = []
 processing = True
 
 
-def start_rec(url):
-    print("start recording...")
-    return subprocess.Popen(["nldl", url])
-
-
+# 録画対象のユーザーIDかチェック
 def check_userid(user_id):
-    list = os.getenv("NAMAREC_USER_ID_LIST")
-    return list is not None and contains(user_id, list)
+    if NAMAREC_USER_ID_LIST is None:
+        return True
+    return contains(user_id, NAMAREC_USER_ID_LIST)
 
 
 def shutdown(_signum, _frame):
@@ -55,14 +57,21 @@ def run():
             break
         print(line)
 
-        userid = get_userid(line)
-        url = get_live_url(line)
-        if userid is None or url is None:
+        info = parse_notification(line)
+        if info is None:
             continue
-        if check_userid(userid):
-            proc = start_rec(url)
-            rec_procs.append(proc)
-            rec_procs[:] = [p for p in rec_procs if p.poll() is None]
+        if check_userid(info["userid"]):
+            filename = "_".join([
+                info["date"],
+                info["live_title"],
+                info["user_name"],
+                info["lvid"]
+            ])
+            filename = f"{filename}.mp4"
+            if info["live_url"] is not None:
+                proc = start_rec(info["live_url"], filename, NICOLIVE_SESSION)
+                rec_procs.append(proc)
+                rec_procs[:] = [p for p in rec_procs if p.poll() is None]
 
     return p.wait()
 
