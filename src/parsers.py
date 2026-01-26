@@ -47,7 +47,7 @@ def get_user_name(s: str):
 
 
 def parse_notification(s: str):
-    slugs = s.split(" ")
+    slugs = s.strip().split(" ")
     if len(slugs) < 5:
         return None
     [date, time, _, type, *payload] = slugs
@@ -73,7 +73,7 @@ def parse_notification(s: str):
 
 
 def parse_nicopush_uaid(s: str):
-    slugs = s.split(" ")
+    slugs = s.strip().split(" ")
     if len(slugs) == 2:
         [_, slug] = slugs
         if slug.startswith("UAID="):
