@@ -1,7 +1,7 @@
 import re
 
 
-def get_userid(s):
+def get_userid(s: str):
     m = re.search(r'"icon":"([^"]+)"', s)
     if m is None:
         return None
@@ -12,7 +12,7 @@ def get_userid(s):
     return m.group(1)
 
 
-def get_live_url(s):
+def get_live_url(s: str):
     m = re.search(r'"on_click":"([^"]+)"', s)
     if m is None:
         return None
@@ -20,7 +20,7 @@ def get_live_url(s):
     return url.split("?")[0]
 
 
-def get_lvid(s):
+def get_lvid(s: str):
     m = re.search(r"(lv\d+)", s)
     if m is None:
         return None
@@ -28,7 +28,7 @@ def get_lvid(s):
     return lvid
 
 
-def get_live_title(s):
+def get_live_title(s: str):
     m = re.search(r'"body":"([^"]+)"', s)
     if m is None:
         return None
@@ -37,7 +37,7 @@ def get_live_title(s):
     return title
 
 
-def get_user_name(s):
+def get_user_name(s: str):
     m = re.search(r'"title":"([^"]+)"', s)
     if m is None:
         return None
@@ -46,18 +46,36 @@ def get_user_name(s):
     return user_name
 
 
-def parse_notification(s):
+def parse_notification(s: str):
     slugs = s.split(" ")
-    if len(slugs) != 5:
+    if len(slugs) < 5:
         return None
-    [date, time, _, type, notification] = slugs
+    [date, time, _, type, *payload] = slugs
+    payload = " ".join(payload)
     if type.upper() != "NOTIFICATION":
         return None
 
-    userid = get_userid(notification)
-    live_url = get_live_url(notification)
-    lvid = get_lvid(live_url)
-    user_name = get_user_name(notification)
-    live_title = get_live_title(notification)
+    userid = get_userid(payload)
+    live_url = get_live_url(payload)
+    lvid = get_lvid(live_url) if live_url is not None else None
+    user_name = get_user_name(payload)
+    live_title = get_live_title(payload)
 
-    return {"date": date, "time": time, "userid": userid, "live_url": live_url, "lvid": lvid, "user_name": user_name, "live_title": live_title}
+    return {
+        "date": date,
+        "time": time,
+        "userid": userid,
+        "live_url": live_url,
+        "lvid": lvid,
+        "user_name": user_name,
+        "live_title": live_title,
+    }
+
+
+def parse_nicopush_uaid(s: str):
+    slugs = s.split(" ")
+    if len(slugs) == 2:
+        [_, slug] = slugs
+        if slug.startswith("UAID="):
+            return slug.split("=")[1]
+    return None
