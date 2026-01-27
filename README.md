@@ -4,7 +4,7 @@
 
 ## Dependencies
 
-録画には streamlink, FFmpeg、配信開始通知に受信に genkaieng/nicopush に依存するので、それぞれインストールしておく。
+録画には streamlink, FFmpeg、配信開始通知の受信に genkaieng/nicopush に依存するので、それぞれインストールしておく。
 
 - [streamlink](https://streamlink.github.io/)
 - [FFmpeg](https://www.ffmpeg.org/)
@@ -18,14 +18,12 @@
 cp .env.example .env
 ```
 
-.envファイルを設定
+#### .envファイルを設定
 
 ```
 # 録画するユーザーIDを,(カンマ繋ぎ)繋ぎで設定
 NAMAREC_USER_ID_LIST=
 ```
-
-その他の設定項目については、[genkaieng/nldl](https://github.com/genkaieng/nldl)、[genkaieng/nicopush](https://github.com/genkaieng/nicopush)を参照
 
 ### 実行
 
