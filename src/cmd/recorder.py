@@ -9,6 +9,9 @@ proc = []
 p_tail = None
 
 
+# ===============================================
+# 終了処理
+# ===============================================
 def shutdown(_signum, _frame):
     print("Shutting down...")
 
@@ -25,6 +28,9 @@ signal.signal(signal.SIGTERM, shutdown)
 signal.signal(signal.SIGINT, shutdown)
 
 
+# ===============================================
+# tail → 録画処理
+# ===============================================
 def start_rec(lvid, filename: str):
     print(f"start recording: {lvid}")
 
