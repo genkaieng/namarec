@@ -3,6 +3,8 @@ import signal
 import subprocess
 import threading
 
+from utils import safe_filename
+
 NICOLIVE_BASE_URL = "https://live.nicovideo.jp/watch/"
 
 proc = []
@@ -73,6 +75,6 @@ p_tail = p
 assert p.stdout is not None
 for line in p.stdout:
     [lvid, *slugs] = line.strip().split(",")
-    filename = "_".join([*slugs, lvid]) + ".mp4"
+    filename = safe_filename("_".join([*slugs, lvid]) + ".mp4")
 
     start_rec(lvid=lvid, filename=filename)
