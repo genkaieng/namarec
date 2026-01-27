@@ -1,11 +1,19 @@
+import os
 import shutil
 import signal
 import subprocess
 import threading
+from dotenv import load_dotenv
 
 from utils import safe_filename
+from gcp import upload_to_gcs
+
+load_dotenv()
+OUTPUT_GCS_URI = os.getenv("OUTPUT_GCS_URI")
 
 NICOLIVE_BASE_URL = "https://live.nicovideo.jp/watch/"
+GCS_BUCKET = os.getenv("GCS_BUCKET")
+GCS_PREFIX = os.getenv("GCS_PREFIX", "")
 
 proc = []
 p_tail = None
@@ -60,6 +68,8 @@ def start_rec(lvid, filename: str):
     def watch():
         p1.wait()
         p2.wait()
+        if OUTPUT_GCS_URI is not None:
+            upload_to_gcs(f"{lvid}.mp4", "/".join([OUTPUT_GCS_URI, filename]))
         shutil.move(f"{lvid}.mp4", filename)
 
     threading.Thread(target=watch, daemon=True).start()
