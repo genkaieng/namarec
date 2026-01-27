@@ -1,4 +1,4 @@
-PY := python
+PY := python -u
 LOG_DIR := logs
 PIDS_FILE := $(LOG_DIR)/pids
 

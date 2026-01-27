@@ -14,6 +14,10 @@ proc = None
 
 env = os.environ.copy()
 
+# ===============================================
+# 終了処理
+# ===============================================
+
 
 def shutdown(_signum, _frame):
     print("Shutting down...")
@@ -26,6 +30,12 @@ def shutdown(_signum, _frame):
 
 signal.signal(signal.SIGTERM, shutdown)
 signal.signal(signal.SIGINT, shutdown)
+
+
+# ===============================================
+# プッシュ通知受信 → 書き出し
+# ===============================================
+exists_lvids = []  # 既に書き出し済みのlvidは保持（重複チェックに使う）
 
 while processing:
     p = subprocess.Popen(
@@ -46,10 +56,13 @@ while processing:
         if info is None:
             uaid = parse_nicopush_uaid(line)
             if uaid is not None:
-                # 次回から指定するUAIDを取得
+                # UAIDを取得（次回から指定する）
                 env["NICOPUSH_UAID"] = uaid
             continue
 
+        # 重複チェック
+        if info["lvid"] in exists_lvids:
+            continue
         if contains(info["userid"], NAMAREC_USER_ID_LIST):
             row = ",".join([
                 info["lvid"],
@@ -58,5 +71,6 @@ while processing:
                 info["user_name"],
             ])
             os.system(f"echo {row} >> nicolive.csv")
+            exists_lvids.append(info["lvid"])
 
     p.wait()
