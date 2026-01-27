@@ -9,7 +9,13 @@ RECORDER_CMD := PYTHONPATH=src $(PY) src/cmd/recorder.py
 NICOPUSH_LOG := $(LOG_DIR)/nicopush.log
 RECORDER_LOG := $(LOG_DIR)/recorder.log
 
-.PHONY: run nicopush recorder nicopush-bg recorder-bg stop logs
+.PHONY: install test run nicopush recorder nicopush-bg recorder-bg stop logs
+
+install:
+	pip install -r requirements.txt
+
+test:
+	pytest
 
 run: nicopush-bg recorder-bg
 
