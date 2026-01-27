@@ -1,6 +1,7 @@
 import os
 import signal
 import subprocess
+from pathlib import Path
 from dotenv import load_dotenv
 
 from parsers import parse_nicopush_uaid, parse_notification
@@ -9,6 +10,9 @@ from utils import contains
 load_dotenv()
 NAMAREC_USER_ID_LIST = os.getenv("NAMAREC_USER_ID_LIST")
 
+OUTPUT_FILE = Path("logs") / "lvids"
+
+# プロセスとステータスを保持
 processing = True
 proc = None
 
@@ -69,7 +73,7 @@ while processing:
                 info["live_title"],
                 info["user_name"],
             ])
-            os.system(f"echo {row} >> nicolive.csv")
+            os.system(f"echo {row} >> {OUTPUT_FILE}")
             exists_lvids.append(info["lvid"])
 
     p.wait()

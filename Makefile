@@ -1,6 +1,7 @@
 PY := python -u
 LOG_DIR := logs
 PIDS_FILE := $(LOG_DIR)/pids
+LVIDS_FILE := $(LOG_DIR)/lvids
 
 NICOPUSH_CMD := PYTHONPATH=src $(PY) src/cmd/nicopush.py
 RECORDER_CMD := PYTHONPATH=src $(PY) src/cmd/recorder.py
@@ -8,28 +9,30 @@ RECORDER_CMD := PYTHONPATH=src $(PY) src/cmd/recorder.py
 NICOPUSH_LOG := $(LOG_DIR)/nicopush.log
 RECORDER_LOG := $(LOG_DIR)/recorder.log
 
-.PHONY: run nicopush recorder nicopush-fg recorder-fg stop logs
+.PHONY: run nicopush recorder nicopush-bg recorder-bg stop logs
 
-run: nicopush recorder
+run: nicopush-bg recorder-bg
 
-nicopush:
+nicopush-bg:
 	mkdir -p $(LOG_DIR)
-	touch nicolive.csv
+	touch $(LVIDS_FILE)
 	$(NICOPUSH_CMD) >> $(NICOPUSH_LOG) 2>&1 & echo $$! >> $(PIDS_FILE)
 	@echo "nicopush started"
 
-recorder:
+recorder-bg:
 	mkdir -p $(LOG_DIR)
-	touch nicolive.csv
+	touch $(LVIDS_FILE)
 	$(RECORDER_CMD) >> $(RECORDER_LOG) 2>&1 & echo $$! >> $(PIDS_FILE)
 	@echo "recorder started"
 
-nicopush-fg:
-	touch nicolive.csv
+nicopush:
+	mkdir -p $(LOG_DIR)
+	touch $(LVIDS_FILE)
 	$(NICOPUSH_CMD)
 
-recorder-fg:
-	touch nicolive.csv
+recorder:
+	mkdir -p $(LOG_DIR)
+	touch $(LVIDS_FILE)
 	$(RECORDER_CMD)
 
 stop:
@@ -39,6 +42,9 @@ stop:
 		echo "stopped"; \
 	else \
 		echo "no pids"; \
+	fi
+	@if [ -f $(PIDS_FILE) ]; then \
+		rm -f $(LVIDS_FILE); \
 	fi
 
 logs:

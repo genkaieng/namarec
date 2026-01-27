@@ -3,6 +3,7 @@ import shutil
 import signal
 import subprocess
 import threading
+from pathlib import Path
 from dotenv import load_dotenv
 
 from utils import safe_filename
@@ -11,10 +12,11 @@ from gcp import upload_to_gcs
 load_dotenv()
 OUTPUT_GCS_URI = os.getenv("OUTPUT_GCS_URI")
 
-NICOLIVE_BASE_URL = "https://live.nicovideo.jp/watch/"
-GCS_BUCKET = os.getenv("GCS_BUCKET")
-GCS_PREFIX = os.getenv("GCS_PREFIX", "")
+INPUT_FILE = Path("logs") / "lvids"
 
+NICOLIVE_BASE_URL = "https://live.nicovideo.jp/watch/"
+
+# プロセスを保持
 proc = []
 p_tail = None
 
@@ -76,7 +78,7 @@ def start_rec(lvid, filename: str):
 
 
 p = subprocess.Popen(
-    ["tail", "-F", "nicolive.csv"],
+    ["tail", "-F", INPUT_FILE],
     stdout=subprocess.PIPE,
     text=True
 )
