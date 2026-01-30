@@ -13,6 +13,8 @@ load_dotenv()
 OUTPUT_GCS_URI = os.getenv("OUTPUT_GCS_URI")
 
 INPUT_FILE = Path("logs") / "lvids"
+INPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+INPUT_FILE.touch(exist_ok=True)
 
 NICOLIVE_BASE_URL = "https://live.nicovideo.jp/watch/"
 

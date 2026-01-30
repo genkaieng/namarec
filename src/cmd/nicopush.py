@@ -11,6 +11,8 @@ load_dotenv()
 NAMAREC_USER_ID_LIST = os.getenv("NAMAREC_USER_ID_LIST")
 
 OUTPUT_FILE = Path("logs") / "lvids"
+OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+OUTPUT_FILE.touch(exist_ok=True)
 
 # プロセスとステータスを保持
 processing = True
@@ -38,7 +40,7 @@ signal.signal(signal.SIGINT, shutdown)
 # ===============================================
 # プッシュ通知受信 → フィルタ → 書き出し
 # ===============================================
-exists_lvids = []  # 既に書き出し済みのlvidは保持（重複チェックに使う）
+exists_lvids = []  # 既に書き出し済みのlvidを保持（重複チェックに使う）
 
 while processing:
     p = subprocess.Popen(
