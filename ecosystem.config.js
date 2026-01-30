@@ -34,5 +34,22 @@ module.exports = {
       restart_delay: 5000,
       exp_backoff_restart_delay: 1000,
     },
+    {
+      name: "gcs_uploader",
+      script: "bash",
+      args: "-c 'fswatch -0 --event Created --event Renamed dist | xargs -0 -n1 python -u src/cmd/upload.py'",
+      interpreter: "none",
+      cwd: __dirname,
+      env: {
+        PYTHONPATH: "src",
+      },
+      out_file: "logs/gcs_uploader.log",
+      error_file: "logs/gcs_uploader.log",
+      merge_logs: true,
+      autorestart: true,
+      max_restarts: 50,
+      restart_delay: 5000,
+      exp_backoff_restart_delay: 1000,
+    },
   ],
 };

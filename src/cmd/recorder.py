@@ -1,4 +1,3 @@
-import os
 import shutil
 import signal
 import subprocess
@@ -7,14 +6,14 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from utils import safe_filename
-from gcp import upload_to_gcs
 
 load_dotenv()
-OUTPUT_GCS_URI = os.getenv("OUTPUT_GCS_URI")
 
 INPUT_FILE = Path("logs") / "lvids"
 INPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
 INPUT_FILE.touch(exist_ok=True)
+
+DIST_DIR = Path("dist")
 
 NICOLIVE_BASE_URL = "https://live.nicovideo.jp/watch/"
 
@@ -72,9 +71,8 @@ def start_rec(lvid, filename: str):
     def watch():
         p1.wait()
         p2.wait()
-        if OUTPUT_GCS_URI is not None:
-            upload_to_gcs(f"{lvid}.mp4", "/".join([OUTPUT_GCS_URI, filename]))
-        shutil.move(f"{lvid}.mp4", filename)
+        shutil.move(f"{lvid}.mp4", DIST_DIR / filename)
+        print(f"[OK] {DIST_DIR / filename}")
 
     threading.Thread(target=watch, daemon=True).start()
 
