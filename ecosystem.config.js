@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "nicopush",
       script: "src/cmd/nicopush.py",
-      interpreter: "python",
+      interpreter: ".venv/bin/python",
       interpreter_args: "-u",
       cwd: __dirname,
       env: {
@@ -20,7 +20,7 @@ module.exports = {
     {
       name: "recorder",
       script: "src/cmd/recorder.py",
-      interpreter: "python",
+      interpreter: ".venv/bin/python",
       interpreter_args: "-u",
       cwd: __dirname,
       env: {
@@ -37,7 +37,7 @@ module.exports = {
     {
       name: "gcs_uploader",
       script: "bash",
-      args: "-c 'fswatch -0 --event Created --event Renamed dist | xargs -0 -n1 python -u src/cmd/upload.py'",
+      args: "-c 'fswatch -0 --event Created --event Renamed dist | xargs -0 -n1 .venv/bin/python -u src/cmd/upload.py'",
       interpreter: "none",
       cwd: __dirname,
       env: {
