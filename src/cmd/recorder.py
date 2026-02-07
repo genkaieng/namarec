@@ -58,10 +58,12 @@ def start_rec(lvid, filename: str):
         "ffmpeg",
         "-i",
         "pipe:0",
-        "-c", "copy",
-        "-f", "mp4",
+        "-c",
+        "copy",
+        "-f",
+        "mp4",
         "-y",
-        f"{lvid}.mp4"
+        f"{lvid}.mp4",
     ]
     p1 = subprocess.Popen(streamlink_cmd, stdout=subprocess.PIPE)
     p2 = subprocess.Popen(ffmpeg_cmd, stdin=p1.stdout)
@@ -77,11 +79,7 @@ def start_rec(lvid, filename: str):
     threading.Thread(target=watch, daemon=True).start()
 
 
-p = subprocess.Popen(
-    ["tail", "-F", INPUT_FILE],
-    stdout=subprocess.PIPE,
-    text=True
-)
+p = subprocess.Popen(["tail", "-F", INPUT_FILE], stdout=subprocess.PIPE, text=True)
 p_tail = p
 
 assert p.stdout is not None

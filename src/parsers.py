@@ -46,24 +46,31 @@ def get_user_name(s: str):
     return user_name
 
 
+def get_created_at(s: str):
+    m = re.search(r'"created_at":"([^"]+)"', s)
+    if m is None:
+        return None
+    return m.group(1)
+
+
 def parse_notification(s: str):
     slugs = s.strip().split(" ")
-    if len(slugs) < 5:
+    if len(slugs) < 2:
         return None
-    [date, time, _, type, *payload] = slugs
+    if slugs[0].upper() != "NOTIFICATION:":
+        return None
+    [_, *payload] = slugs
     payload = " ".join(payload)
-    if type.upper() != "NOTIFICATION":
-        return None
 
     userid = get_userid(payload)
     live_url = get_live_url(payload)
     lvid = get_lvid(live_url) if live_url is not None else None
     user_name = get_user_name(payload)
     live_title = get_live_title(payload)
+    created_at = get_created_at(payload)
 
     return {
-        "date": date,
-        "time": time,
+        "timestamp": created_at,
         "userid": userid,
         "live_url": live_url,
         "lvid": lvid,
@@ -74,8 +81,8 @@ def parse_notification(s: str):
 
 def parse_nicopush_uaid(s: str):
     slugs = s.strip().split(" ")
-    if len(slugs) == 2:
-        [_, slug] = slugs
-        if slug.startswith("UAID="):
-            return slug.split("=")[1]
+    if len(slugs) < 4:
+        return None
+    if slugs[-1].startswith("UAID="):
+        return slugs[-1].split("=")[1]
     return None

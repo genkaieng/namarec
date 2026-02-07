@@ -1,7 +1,7 @@
 import re
 
 
-def contains(v, s):
+def contains(v, s: str):
     return v in s.replace(" ", "").strip().split(",")
 
 

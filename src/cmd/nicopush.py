@@ -9,6 +9,7 @@ from utils import contains
 
 load_dotenv()
 NAMAREC_USER_ID_LIST = os.getenv("NAMAREC_USER_ID_LIST")
+print("NAMAREC_USER_ID_LIST={NAMAREC_USER_ID_LIST}")
 
 OUTPUT_FILE = Path("logs") / "lvids"
 OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -49,7 +50,7 @@ while processing:
         stderr=subprocess.STDOUT,
         text=True,
         bufsize=1,
-        env=env
+        env=env,
     )
     proc = p
 
@@ -68,13 +69,17 @@ while processing:
         # 重複チェック
         if info["lvid"] in exists_lvids:
             continue
-        if contains(info["userid"], NAMAREC_USER_ID_LIST):
-            row = ",".join([
-                info["lvid"],
-                info["date"].replace("/", ""),
-                info["live_title"],
-                info["user_name"],
-            ])
+        if NAMAREC_USER_ID_LIST is not None and contains(
+            info["userid"], NAMAREC_USER_ID_LIST
+        ):
+            row = ",".join(
+                [
+                    info["lvid"],
+                    info["timestamp"].split("T")[0].replace("-", ""),
+                    info["live_title"],
+                    info["user_name"],
+                ]
+            )
             os.system(f"echo {row} >> {OUTPUT_FILE}")
             exists_lvids.append(info["lvid"])
 
