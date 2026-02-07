@@ -28,19 +28,5 @@ NAMAREC_USER_ID_LIST=
 ### 実行
 
 ```sh
-make run
-```
-
-### 個別に実行
-
-#### 配信開始通知受信プロセス
-
-```sh
-make nicopush
-```
-
-#### 自動録画プロセス
-
-```sh
-make recorder
+make start
 ```
